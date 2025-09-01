@@ -10,19 +10,30 @@ body, html {
 /* This container will define the max area for the flipbook */
 .flipbook-container {
     position: absolute;
-    top: 5%; /* A little space from the top */
+    top: 5%;
     left: 5%;
     right: 5%;
     bottom: 5%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center; /* This centers the book when NOT zoomed */
+    overflow: hidden; /* HIDE scrollbars by default */
 }
+
+/* THIS RULE IS UPDATED to control scrollbars and alignment */
+/* When zoomed, show scrollbars and align to the top-left for intuitive panning */
+.flipbook-container.zoomed-in {
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow: auto;
+}
+
 
 /* The flipbook will now be flexible and fill the container */
 #flipbook {
     width: 100%;
     height: 100%;
+    /* margin was removed to prevent unwanted scrollbars */
 }
 
 /* The pages will also be flexible */
@@ -40,4 +51,36 @@ body, html {
     -webkit-box-shadow: 0 0 20px rgba(0,0,0,0.3);
     -moz-box-shadow: 0 0 20px rgba(0,0,0,0.3);
     box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+/* --- ZOOM CONTROLS CSS (from previous step) --- */
+.zoom-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000; /* Ensures buttons are on top of the flipbook */
+    display: flex;
+    flex-direction: column;
+}
+
+.zoom-controls button {
+    font-size: 24px;
+    font-weight: bold;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 1px solid #aaa;
+    background-color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.2s;
+}
+
+.zoom-controls button:hover {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.zoom-controls button:active {
+    background-color: #e0e0e0;
 }
