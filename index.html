@@ -38,42 +38,55 @@
 
 
 <script type="text/javascript">
-    function resizeFlipbook() {
-        var container = $('.flipbook-container');
+    /**
+     * This function is the core of the responsive logic.
+     * It checks the container's aspect ratio to decide whether to show
+     * a single page or a double-page spread and resizes the book accordingly.
+     */
+    function updateFlipbookLayout() {
         var book = $('#flipbook');
-        
-        // Do not resize if zoomed in, to allow scrolling
+        var container = $('.flipbook-container');
+
+        // Exit if the user is zoomed in to allow for panning
         if (book.turn('zoom') > 1) {
             return;
         }
-        
-        // Reset book size to auto to get the container's dimensions
-        book.turn('size', 'auto', 'auto');
-        
-        var containerWidth = container.width();
-        var containerHeight = container.height();
-        
-        // Get the aspect ratio from one of your images
-        var imageAspectRatio = 850 / 1100; // Example: 850px width / 1100px height
-        
-        var bookWidth, bookHeight;
 
-        // Calculate the new size based on the container's aspect ratio
-        if (containerWidth / containerHeight > imageAspectRatio * 2) {
-            bookHeight = containerHeight;
-            bookWidth = bookHeight * imageAspectRatio * 2;
-        } else {
-            bookWidth = containerWidth;
-            bookHeight = (bookWidth / 2) / imageAspectRatio;
+        // 1. Determine the best display mode based on container aspect ratio
+        // If the container is portrait-like, use 'single' page display
+        var newDisplay = (container.width() / container.height() < 1.1) ? 'single' : 'double';
+
+        // Update the display mode if it has changed
+        if (book.turn('display') !== newDisplay) {
+            book.turn('display', newDisplay);
         }
 
-        // Set the new size for the flipbook
+        // 2. Calculate the new size of the flipbook
+        var imageAspectRatio = 850 / 1100; // Aspect ratio of a single page (width / height)
+        var numVisiblePages = (newDisplay === 'double') ? 2 : 1;
+        var bookAspectRatio = imageAspectRatio * numVisiblePages;
+
+        var containerWidth = container.width();
+        var containerHeight = container.height();
+        var bookWidth, bookHeight;
+
+        // Fit the book to the container while maintaining its aspect ratio
+        if (containerWidth / containerHeight > bookAspectRatio) {
+            bookHeight = containerHeight;
+            bookWidth = bookHeight * bookAspectRatio;
+        } else {
+            bookWidth = containerWidth;
+            bookHeight = bookWidth / bookAspectRatio;
+        }
+
+        // 3. Apply the new size and re-center the book
         book.turn('size', bookWidth, bookHeight);
+        book.turn('center');
     }
 
     // Initialize the flipbook
     $('#flipbook').turn({
-        display: 'double',
+        display: 'double', // Starts as 'double', but updateFlipbookLayout will correct it
         elevation: 50,
         gradients: true,
         autoCenter: true,
@@ -84,13 +97,15 @@
         }
     });
 
-    // Resize the flipbook when the window is resized
+    // Update the layout on window resize
     $(window).on('resize', function() {
-        resizeFlipbook();
-    }).trigger('resize');
+        // Use a small timeout to prevent rapid firing, improving performance
+        clearTimeout(window.resizeTimer);
+        window.resizeTimer = setTimeout(updateFlipbookLayout, 100);
+    }).trigger('resize'); // Trigger once on load to set the initial layout
 
 
-    // --- ZOOM FUNCTIONALITY - FINAL ---
+    // --- ZOOM FUNCTIONALITY - Logic updated slightly for better resizing ---
     (function() {
         var zoomLevel = 1;
         var zoomStep = 0.2;
@@ -115,8 +130,8 @@
             
             if (zoomLevel <= minZoom) {
                 container.removeClass('zoomed-in');
-                // THIS LINE IS ADDED FOR A ROBUST RESIZE
-                $(window).trigger('resize');
+                // Directly call our layout function to resize the book correctly
+                updateFlipbookLayout();
             }
         });
     })();
