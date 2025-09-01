@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Power Values Flipbook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="turn.min.js"></script>
+</head>
+<body>
+
+<div class="flipbook-container">
+    <div id="flipbook">
+        <div class="page"><img src="pages/page-1.jpg" alt="Page 1"></div>
+        <div class="page"><img src="pages/page-2.jpg" alt="Page 2"></div>
+        <div class="page"><img src="pages/page-3.jpg" alt="Page 3"></div>
+        <div class="page"><img src="pages/page-4.jpg" alt="Page 4"></div>
+        <div class="page"><img src="pages/page-5.jpg" alt="Page 5"></div>
+        <div class="page"><img src="pages/page-6.jpg" alt="Page 6"></div>
+        <div class="page"><img src="pages/page-7.jpg" alt="Page 7"></div>
+        <div class="page"><img src="pages/page-8.jpg" alt="Page 8"></div>
+        <div class="page"><img src="pages/page-9.jpg" alt="Page 9"></div>
+        <div class="page"><img src="pages/page-10.jpg" alt="Page 10"></div>
+        <div class="page"><img src="pages/page-11.jpg" alt="Page 11"></div>
+        <div class="page"><img src="pages/page-12.jpg" alt="Page 12"></div>
+        <div class="page"><img src="pages/page-13.jpg" alt="Page 13"></div>
+        <div class="page"><img src="pages/page-14.jpg" alt="Page 14"></div>
+        <div class="page"><img src="pages/page-15.jpg" alt="Page 15"></div>
+        <div class="page"><img src="pages/page-16.jpg" alt="Page 16"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function resizeFlipbook() {
+        var container = $('.flipbook-container');
+        var book = $('#flipbook');
+        
+        // Reset book size to auto to get the container's dimensions
+        book.turn('size', 'auto', 'auto');
+        
+        var containerWidth = container.width();
+        var containerHeight = container.height();
+        
+        // Get the aspect ratio from one of your images
+        // IMPORTANT: Change these two numbers to your image's actual dimensions
+        var imageAspectRatio = 850 / 1100; // Example: 850px width / 1100px height
+        
+        var bookWidth, bookHeight;
+
+        // Calculate the new size based on the container's aspect ratio
+        if (containerWidth / containerHeight > imageAspectRatio * 2) {
+            // Container is wider than the book, so height is the limiting factor
+            bookHeight = containerHeight;
+            bookWidth = bookHeight * imageAspectRatio * 2;
+        } else {
+            // Container is taller than the book, so width is the limiting factor
+            bookWidth = containerWidth;
+            bookHeight = (bookWidth / 2) / imageAspectRatio;
+        }
+
+        // Set the new size for the flipbook
+        book.turn('size', bookWidth, bookHeight);
+    }
+
+    // Initialize the flipbook
+    $('#flipbook').turn({
+        display: 'double',
+        elevation: 50,
+        gradients: true,
+        autoCenter: true,
+        when: {
+            turned: function(e, page) {
+                // console.log('Current view: ', $(this).turn('view'));
+            }
+        }
+    });
+
+    // Resize the flipbook when the window is resized
+    $(window).on('resize', function() {
+        resizeFlipbook();
+    }).trigger('resize'); // Initial resize on page load
+
+</script>
+
+</body>
+</html>
